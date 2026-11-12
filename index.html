@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hama Dev - Roblox Codes</title>
-    <!-- گرتنی QR کۆد لە لایبریری دەرەکی -->
+    <!-- لایبریری QR و لایبریری وێنەگرتنی شاشە (html2canvas) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -75,8 +76,13 @@
         }
         .success {
             color: var(--accent);
-            font-size: 14px;
-            margin-top: 5px;
+            font-size: 15px;
+            margin-top: 10px;
+            line-height: 1.6;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
         }
         #qrcode {
             display: flex;
@@ -89,15 +95,6 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .code-item {
-            background: #0f172a;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
         .admin-panel {
             border-top: 2px dashed #334155;
             margin-top: 20px;
@@ -107,28 +104,29 @@
 </head>
 <body>
 
-    <div class="container">
-        <!-- بەشی چوونەژوورەوە (Login) -->
+    <div class="container" id="capture-area">
+        <!-- بەشی چوونەژوورەوە -->
         <div id="login-section">
             <h1>Hama Dev Arena</h1>
-            <p>تکایە ناوی بەکارهێنەر و وشەی نەێنی بنووسە</p>
+            <p>ناوی خۆت بنووسە بۆ چوونەژوورەوە</p>
             <input type="text" id="username" placeholder="ناوی بەکارهێنەر (بۆ نموونە: hama dev)">
-            <input type="password" id="password" placeholder="وشەی نەێنی (Password)">
+            <input type="password" id="password" placeholder="پاسپۆرد (هەر پاسپۆردێک بێت)">
             <button onclick="login()">چوونەژوورەوە</button>
             <div id="login-error" class="error"></div>
             
             <hr style="margin: 20px 0; border-color: #334155;">
             <button onclick="toggleQR()" style="background: #334155;">چوونەژوورەوە بە QR کۆد</button>
             <div id="qr-container" class="hidden">
-                <p style="font-size: 13px; margin: 5px 0;">ئەم QR کۆدە سکان بکە بۆ چوونەژوورەوەی خێرا:</p>
+                <p style="font-size: 13px; margin: 5px 0;">QR کۆدی چوونەژوورەوەی خێرا:</p>
                 <div id="qrcode"></div>
+                <button onclick="qrLogin()" style="background: var(--accent); margin-top: 5px;">چوونەژوورەوە لەڕێگەی QR</button>
             </div>
         </div>
 
-        <!-- بەشی یاری و کۆد لێدان (Game & Redemption) -->
+        <!-- بەشی یاری و کۆد لێدان -->
         <div id="game-section" class="hidden">
             <h2 id="welcome-msg"></h2>
-            <p>کۆدی ڕۆبۆکس لێرە بنووسە بۆ وەرگرتنی دیارییەکەت!</p>
+            <p>کۆدی ڕۆبۆکس لێرە بنووسە بۆ وەرگرتنی خەڵاتەکەت!</p>
             <input type="text" id="user-code" placeholder="کۆدەکان لێرە بنووسە...">
             <button onclick="redeemCode()">لێدانی کۆد (Redeem)</button>
             <div id="redeem-msg"></div>
@@ -138,7 +136,7 @@
                 <h3>پەنێڵی بەڕێوەبەر (Hama Dev)</h3>
                 <input type="text" id="new-robux-code" placeholder="کۆدی نوێی ڕۆبۆکس...">
                 <button onclick="addNewCode()" style="background: var(--accent);">زیادکردنی کۆدی نوێ</button>
-                <div id="admin-msg" class="success"></div>
+                <div id="admin-msg" class="success" style="background:none; border:none;"></div>
             </div>
 
             <button onclick="logout()" style="background: #ef4444; margin-top: 20px;">چوونەدەرەوە</button>
@@ -146,12 +144,12 @@
     </div>
 
     <script>
-        // کۆدە سەرەتاییەکانی ڕۆبۆکس لە ناو سیستەمدا
+        // کۆدە سەرەتاییەکانی ڕۆبۆکس
         let robuxCodes = JSON.parse(localStorage.getItem('hama_codes')) || ["ROBLOX2026", "HAMADEV100", "FREE_ROBUX"];
 
-        // دروستکردنی QR کۆد بۆ چوونەژوورەوە
+        // دروستکردنی QR کۆد
         new QRCode(document.getElementById("qrcode"), {
-            text: "HamaDev_Login_Verified_2019",
+            text: "HamaDev_QR_User_Verified",
             width: 128,
             height: 128
         });
@@ -161,24 +159,32 @@
             qrDiv.classList.toggle('hidden');
         }
 
+        function qrLogin() {
+            sessionStorage.setItem('role', 'user');
+            sessionStorage.setItem('user', 'QR_Player');
+            startApp('user');
+        }
+
         function login() {
-            const user = document.getElementById('username').value.trim().toLowerCase();
+            const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
             const errorDiv = document.getElementById('login-error');
 
-            // پێکهێنانی مەرجی چوونەژوورەوە
-            if (user === 'hama dev' && pass === '2019') {
-                // ئەگەر خۆت بوویت (Admin)
+            if (!user || !pass) {
+                errorDiv.innerText = "تکایە ناو و پاسپۆرد بنووسە!";
+                return;
+            }
+
+            // ئەگەر ناوی hama dev بوو ئەوا دەبێتە ئەدمین (خاوەن یاری)
+            if (user.toLowerCase() === 'hama dev') {
                 sessionStorage.setItem('role', 'admin');
                 sessionStorage.setItem('user', 'Hama Dev');
                 startApp('admin');
-            } else if (user !== '' && pass === '2019') {
-                // ئەگەر بەکارهێنەری ئاسایی بوو
+            } else {
+                // بەکارهێنەری ئاسایی بە هەر پاسپۆردێک
                 sessionStorage.setItem('role', 'user');
                 sessionStorage.setItem('user', user);
                 startApp('user');
-            } else {
-                errorDiv.innerText = "ناوی بەکارهێنەر یاخود وشەی نەێنی (2019) هەڵەیە!";
             }
         }
 
@@ -207,10 +213,28 @@
 
             const index = robuxCodes.indexOf(codeInput);
             if (index !== -1) {
-                // کۆدەکە ڕاستە و بەکارهێنرا، دەسڕدرێتەوە تا دووبارە نەبێتەوە
+                // کۆدەکە ڕاستە، دەسڕدرێتەوە
                 robuxCodes.splice(index, 1);
                 localStorage.setItem('hama_codes', JSON.stringify(robuxCodes));
-                msgDiv.innerHTML = '<span class="success">🎉 پیرۆزە! کۆدەکە سەرکەوتوو بوو، ڕۆبۆکسەکە گەیشت!</span>';
+                
+                // نیشاندانی پەیامی سەرکەوتن و داوای ڕەسم ناردن
+                msgDiv.innerHTML = `
+                    <div class="success">
+                        🎉 <strong>پیرۆزت بێت!</strong> کۆدەکە ڕاستە.<br>
+                        📸 <em>وێنەی ئەم شاشەیە بگرە (Screenshot) و ڕەسمەکە بۆ Hama Dev بنێرە بۆ وەرگرتنی خەڵاتەکەت!</em>
+                    </div>
+                `;
+
+                // بە شێوازی خۆکارانەش ڕەسمی شاشەکە (Screenshot) دەگرێت و دەیبەخشێت بە بەکارهێنەر بۆ داگرتن
+                setTimeout(() => {
+                    html2canvas(document.getElementById('capture-area')).then(canvas => {
+                        let link = document.createElement('a');
+                        link.download = 'HamaDev-Reward.png';
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    });
+                }, 1000);
+
             } else {
                 msgDiv.innerHTML = '<span class="error">❌ کۆدەکە هەڵەیە یان پێشتر بەکارهاتووە!</span>';
             }
