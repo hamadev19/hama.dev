@@ -1,351 +1,239 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hama Dev - Robux Code System</title>
+    <title>Hama Dev - Roblox Codes</title>
+    <!-- گرتنی QR کۆد لە لایبریری دەرەکی -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        @import url('https://googleapis.com');
-        
-        * {
-            box-sizing: border-box;
-            font-family: 'Noto Kufi Arabic', sans-serif;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --accent: #10b981;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            background: linear-gradient(135deg, #090d16, #131c31, #0a192f);
-            color: #ffffff;
-            min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            border: 1px solid #00f2fe;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
-        }
-
-        .header h1 {
-            color: #00f2fe;
-            font-size: 24px;
-            font-weight: 900;
-        }
-
-        .header p {
-            color: #a0aec0;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-
-        .box {
-            background: rgba(20, 28, 46, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
             border-radius: 16px;
-            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #ffd700;
+            max-width: 450px;
             text-align: center;
+            box-sizing: border-box;
         }
-
-        input {
+        h1, h2 {
+            margin-bottom: 20px;
+            color: #818cf8;
+        }
+        input, button {
             width: 100%;
             padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid #2d3748;
-            background: #0f1626;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
             color: #fff;
-            font-size: 14px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: var(--primary);
             outline: none;
         }
-
-        input:focus {
-            border-color: #00f2fe;
-        }
-
         button {
-            width: 100%;
-            padding: 12px;
+            background: var(--primary);
             border: none;
-            border-radius: 10px;
-            background: linear-gradient(90deg, #00f2fe, #4facfe);
-            color: #000;
-            font-weight: 700;
-            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
-            margin-bottom: 10px;
+            transition: background 0.3s;
         }
-
         button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+            background: var(--primary-dark);
         }
-
-        .btn-gold {
-            background: linear-gradient(90deg, #f6d365, #fda085);
-            color: #000;
+        .hidden {
+            display: none !important;
         }
-
-        .btn-danger {
-            background: #e53e3e;
-            color: #fff;
-            margin-top: 10px;
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 5px;
         }
-
-        .robux-card {
-            background: linear-gradient(45deg, #1a202c, #2d3748);
-            border: 2px solid #ffd700;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
+        .success {
+            color: var(--accent);
+            font-size: 14px;
+            margin-top: 5px;
         }
-
-        .robux-amount {
-            font-size: 32px;
-            font-weight: 900;
-            color: #48bb78;
-        }
-
-        .owner-panel {
-            border: 2px solid #ff0055;
-            background: rgba(255, 0, 85, 0.08);
-        }
-
-        .owner-panel h2 {
-            color: #ff0055;
-        }
-
-        .code-list {
-            background: #0f1626;
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            background: #fff;
             padding: 10px;
             border-radius: 8px;
-            margin-top: 10px;
-            font-size: 13px;
-            max-height: 150px;
-            overflow-y: auto;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         }
-
         .code-item {
+            background: #0f172a;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
-            padding: 6px;
-            border-bottom: 1px solid #2d3748;
+            align-items: center;
         }
-
-        .hidden {
-            display: none;
-        }
-
-        .msg {
-            text-align: center;
-            font-size: 13px;
-            margin-top: 10px;
-            font-weight: bold;
+        .admin-panel {
+            border-top: 2px dashed #334155;
+            margin-top: 20px;
+            padding-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🎮 HAMA DEV PLAY</h1>
-        <p>سەکۆی فەرمی کۆد و ڕۆبوکس • ساحەب: rip_hama276</p>
-    </div>
-
-    <!-- بەشی چوونەژوورەوە و دروستکردنی ئەکاونت -->
-    <div id="authBox" class="box">
-        <h2>چوونەژوورەوە یان دروستکردنی ئەکاونت</h2>
-        <input type="text" id="usernameInput" placeholder="ناوی بەکارهێنەر (Username) بنووسە...">
-        <input type="password" id="passwordInput" placeholder="تێپەڕەواژە (Password) بنووسە...">
-        <button onclick="loginOrRegister()">چوونەژوورەوە / دروستکردن</button>
-        <p id="authMsg" class="msg"></p>
-    </div>
-
-    <!-- بەشی سەرەکی یاریزان -->
-    <div id="dashboardBox" class="box hidden">
-        <div class="robux-card">
-            <p>بەخێربێیت، <span id="displayUser" style="color:#00f2fe; font-weight:bold;"></span></p>
-            <p style="font-size: 13px; margin-top: 5px;">باڵانسی ڕۆبوکسەکانت:</p>
-            <div class="robux-amount"><span id="robuxBalance">0</span> R$</div>
-        </div>
-
-        <h2>🎁 داخڵکردنی کۆدی ڕۆبوکس</h2>
-        <input type="text" id="redeemInput" placeholder="کۆدەکە لێرە بنووسە (بۆ نموونە: HAMA2026)">
-        <button class="btn-gold" onclick="redeemCode()">وەرگرتنی ڕۆبوکس</button>
-        <p id="redeemMsg" class="msg"></p>
-
-        <!-- پەنێڵی نهێنی تایبەت بە ساحەب rip_hama276 -->
-        <div id="ownerPanel" class="box owner-panel hidden" style="margin-top: 20px;">
-            <h2>👑 پەنێڵی ساحەب (rip_hama276)</h2>
-            <p style="font-size: 12px; text-align: center; margin-bottom: 10px; color: #cbd5e0;">لێرەوە کۆدی نوێ دروست بکە بۆ یاریزانەکان</p>
+    <div class="container">
+        <!-- بەشی چوونەژوورەوە (Login) -->
+        <div id="login-section">
+            <h1>Hama Dev Arena</h1>
+            <p>تکایە ناوی بەکارهێنەر و وشەی نەێنی بنووسە</p>
+            <input type="text" id="username" placeholder="ناوی بەکارهێنەر (بۆ نموونە: hama dev)">
+            <input type="password" id="password" placeholder="وشەی نەێنی (Password)">
+            <button onclick="login()">چوونەژوورەوە</button>
+            <div id="login-error" class="error"></div>
             
-            <input type="text" id="newCodeName" placeholder="ناوی کۆدە نوێیەکە (بۆ نموونە: KURD500)">
-            <input type="number" id="newCodeAmount" placeholder="بڕی ڕۆبوکس (بۆ نموونە: 500)">
-            <button onclick="createCode()">➕ دروستکردنی کۆد</button>
-            <p id="ownerMsg" class="msg"></p>
-
-            <div class="code-list" id="activeCodesList">
-                <!-- لیستی کۆدە چالاکەکان لێرە دەردەکەوێت -->
+            <hr style="margin: 20px 0; border-color: #334155;">
+            <button onclick="toggleQR()" style="background: #334155;">چوونەژوورەوە بە QR کۆد</button>
+            <div id="qr-container" class="hidden">
+                <p style="font-size: 13px; margin: 5px 0;">ئەم QR کۆدە سکان بکە بۆ چوونەژوورەوەی خێرا:</p>
+                <div id="qrcode"></div>
             </div>
         </div>
 
-        <button class="btn-danger" onclick="logout()">دەرچوون لە ئەکاونت</button>
+        <!-- بەشی یاری و کۆد لێدان (Game & Redemption) -->
+        <div id="game-section" class="hidden">
+            <h2 id="welcome-msg"></h2>
+            <p>کۆدی ڕۆبۆکس لێرە بنووسە بۆ وەرگرتنی دیارییەکەت!</p>
+            <input type="text" id="user-code" placeholder="کۆدەکان لێرە بنووسە...">
+            <button onclick="redeemCode()">لێدانی کۆد (Redeem)</button>
+            <div id="redeem-msg"></div>
+
+            <!-- بەشی زیادکردنی کۆد تەنها بۆ خاوەن ماڵپەڕ (Hama Dev) -->
+            <div id="admin-section" class="admin-panel hidden">
+                <h3>پەنێڵی بەڕێوەبەر (Hama Dev)</h3>
+                <input type="text" id="new-robux-code" placeholder="کۆدی نوێی ڕۆبۆکس...">
+                <button onclick="addNewCode()" style="background: var(--accent);">زیادکردنی کۆدی نوێ</button>
+                <div id="admin-msg" class="success"></div>
+            </div>
+
+            <button onclick="logout()" style="background: #ef4444; margin-top: 20px;">چوونەدەرەوە</button>
+        </div>
     </div>
 
     <script>
-        // ناوی ساحەبی سەرەکی
-        const OWNER_USERNAME = "rip_hama276";
+        // کۆدە سەرەتاییەکانی ڕۆبۆکس لە ناو سیستەمدا
+        let robuxCodes = JSON.parse(localStorage.getItem('hama_codes')) || ["ROBLOX2026", "HAMADEV100", "FREE_ROBUX"];
 
-        // بارکردنی داتاکان لە بیرگەی وێبگەڕ
-        let users = JSON.parse(localStorage.getItem("hamaUsers")) || {};
-        let codes = JSON.parse(localStorage.getItem("hamaCodes")) || {
-            "HAMA2026": 100,
-            "KURDISTAN": 250
-        };
-        let currentUser = localStorage.getItem("hamaCurrentUser") || null;
+        // دروستکردنی QR کۆد بۆ چوونەژوورەوە
+        new QRCode(document.getElementById("qrcode"), {
+            text: "HamaDev_Login_Verified_2019",
+            width: 128,
+            height: 128
+        });
 
-        function saveData() {
-            localStorage.setItem("hamaUsers", JSON.stringify(users));
-            localStorage.setItem("hamaCodes", JSON.stringify(codes));
+        function toggleQR() {
+            const qrDiv = document.getElementById('qr-container');
+            qrDiv.classList.toggle('hidden');
         }
 
-        function loginOrRegister() {
-            const user = document.getElementById("usernameInput").value.trim();
-            const pass = document.getElementById("passwordInput").value.trim();
-            const msg = document.getElementById("authMsg");
+        function login() {
+            const user = document.getElementById('username').value.trim().toLowerCase();
+            const pass = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('login-error');
 
-            if (!user || !pass) {
-                msg.style.color = "#fc8181";
-                msg.innerText = "تکایە ناوی بەکارهێنەر و پاسوۆرد بنووسە!";
-                return;
-            }
-
-            if (users[user]) {
-                // ئەگەر ئەکاونتەکە هەبوو، پشکنینی پاسوۆرد
-                if (users[user].password === pass) {
-                    currentUser = user;
-                    localStorage.setItem("hamaCurrentUser", user);
-                    openDashboard();
-                } else {
-                    msg.style.color = "#fc8181";
-                    msg.innerText = "پاسوۆردەکە هەڵەیە! دووبارە هەوڵبدەرەوە.";
-                }
+            // پێکهێنانی مەرجی چوونەژوورەوە
+            if (user === 'hama dev' && pass === '2019') {
+                // ئەگەر خۆت بوویت (Admin)
+                sessionStorage.setItem('role', 'admin');
+                sessionStorage.setItem('user', 'Hama Dev');
+                startApp('admin');
+            } else if (user !== '' && pass === '2019') {
+                // ئەگەر بەکارهێنەری ئاسایی بوو
+                sessionStorage.setItem('role', 'user');
+                sessionStorage.setItem('user', user);
+                startApp('user');
             } else {
-                // دروستکردنی ئەکاونتی نوێ
-                users[user] = {
-                    password: pass,
-                    robux: user === OWNER_USERNAME ? 999999 : 0,
-                    usedCodes: []
-                };
-                saveData();
-                currentUser = user;
-                localStorage.setItem("hamaCurrentUser", user);
-                openDashboard();
+                errorDiv.innerText = "ناوی بەکارهێنەر یاخود وشەی نەێنی (2019) هەڵەیە!";
             }
         }
 
-        function openDashboard() {
-            document.getElementById("authBox").classList.add("hidden");
-            document.getElementById("dashboardBox").classList.remove("hidden");
+        function startApp(role) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('game-section').classList.remove('hidden');
             
-            document.getElementById("displayUser").innerText = currentUser;
-            document.getElementById("robuxBalance").innerText = users[currentUser].robux;
+            const username = sessionStorage.getItem('user');
+            document.getElementById('welcome-msg').innerText = `بەخێر هاتیت، ${username}!`;
 
-            // ئەگەر ساحەب بوو، پەنێڵی تایبەتی بۆ بکەرەوە
-            if (currentUser === OWNER_USERNAME) {
-                document.getElementById("ownerPanel").classList.remove("hidden");
-                renderCodes();
+            if (role === 'admin') {
+                document.getElementById('admin-section').classList.remove('hidden');
             } else {
-                document.getElementById("ownerPanel").classList.add("hidden");
+                document.getElementById('admin-section').classList.add('hidden');
             }
         }
 
         function redeemCode() {
-            const codeInput = document.getElementById("redeemInput").value.trim().toUpperCase();
-            const msg = document.getElementById("redeemMsg");
+            const codeInput = document.getElementById('user-code').value.trim();
+            const msgDiv = document.getElementById('redeem-msg');
 
             if (!codeInput) {
-                msg.style.color = "#fc8181";
-                msg.innerText = "تکایە کۆدێک بنووسە!";
+                msgDiv.innerHTML = '<span class="error">تکایە کۆدێک بنووسە!</span>';
                 return;
             }
 
-            if (codes[codeInput] !== undefined) {
-                if (users[currentUser].usedCodes.includes(codeInput)) {
-                    msg.style.color = "#f6ad55";
-                    msg.innerText = "تۆ پێشتر ئەم کۆدەت بەکارهێناوە!";
-                } else {
-                    const reward = codes[codeInput];
-                    users[currentUser].robux += reward;
-                    users[currentUser].usedCodes.push(codeInput);
-                    saveData();
+            const index = robuxCodes.indexOf(codeInput);
+            if (index !== -1) {
+                // کۆدەکە ڕاستە و بەکارهێنرا، دەسڕدرێتەوە تا دووبارە نەبێتەوە
+                robuxCodes.splice(index, 1);
+                localStorage.setItem('hama_codes', JSON.stringify(robuxCodes));
+                msgDiv.innerHTML = '<span class="success">🎉 پیرۆزە! کۆدەکە سەرکەوتوو بوو، ڕۆبۆکسەکە گەیشت!</span>';
+            } else {
+                msgDiv.innerHTML = '<span class="error">❌ کۆدەکە هەڵەیە یان پێشتر بەکارهاتووە!</span>';
+            }
+            document.getElementById('user-code').value = '';
+        }
 
-Use code with caution.
-document.getElementById("robuxBalance").innerText = users[currentUser].robux;
-document.getElementById("redeemInput").value = "";
-msg.style.color = "#48bb78";
-msg.innerText = 🎉 پیرۆزە! بڕی ${reward} R$ زیادکرا بۆ ئەکاونتەکەت!;
-}
-} else {
-msg.style.color = "#fc8181";
-msg.innerText = "❌ ئەم کۆدە هەڵەیە یان بەسەرچووە!";
-}
-}
-function createCode() {
-if (currentUser !== OWNER_USERNAME) return;
-const codeName = document.getElementById("newCodeName").value.trim().toUpperCase();
-const codeAmount = parseInt(document.getElementById("newCodeAmount").value);
-const msg = document.getElementById("ownerMsg");
-if (!codeName || isNaN(codeAmount) || codeAmount <= 0) {
-msg.style.color = "#fc8181";
-msg.innerText = "تکایە ناوی کۆد و بڕی ڕۆبوکس بە دروستی بنووسە!";
-return;
-}
-codes[codeName] = codeAmount;
-saveData();
-renderCodes();
-document.getElementById("newCodeName").value = "";
-document.getElementById("newCodeAmount").value = "";
-msg.style.color = "#48bb78";
-msg.innerText = ✅ کۆدی (${codeName}) بە بڕی ${codeAmount} R$ دروستکرا!;
-}
-function renderCodes() {
-const list = document.getElementById("activeCodesList");
-list.innerHTML = "کۆدە چالاکەکان:";
-for (let key in codes) {
-list.innerHTML += <div class="code-item"> <span>🔑 <b>${key}</b></span> <span style="color:#48bb78;">${codes[key]} R$</span> </div>;
-}
-}
-function logout() {
-currentUser = null;
-localStorage.removeItem("hamaCurrentUser");
-document.getElementById("dashboardBox").classList.add("hidden");
-document.getElementById("authBox").classList.remove("hidden");
-document.getElementById("usernameInput").value = "";
-document.getElementById("passwordInput").value = "";
-document.getElementById("authMsg").innerText = "";
-}
-// ئەگەر پێشتر چووبووە ژوورەوە، ڕاستەوخۆ داشبۆرد بکەرەوە
-if (currentUser && users[currentUser]) {
-openDashboard();
-}
+        function addNewCode() {
+            const newCode = document.getElementById('new-robux-code').value.trim();
+            const adminMsg = document.getElementById('admin-msg');
+
+            if (newCode) {
+                robuxCodes.push(newCode);
+                localStorage.setItem('hama_codes', JSON.stringify(robuxCodes));
+                adminMsg.innerText = "کۆدی نوێ بە سەرکەوتوویی زیادکرا!";
+                document.getElementById('new-robux-code').value = '';
+                setTimeout(() => { adminMsg.innerText = ''; }, 3000);
+            }
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+    </script>
+</body>
+</html>
